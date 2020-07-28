@@ -1,0 +1,32 @@
+---
+title: "Churn Prediction"
+author: "Sheetanshu"
+date: "7/27/2020"
+output: github_document
+---
+
+```{r}
+
+getwd()
+
+Cellphn.d = read.csv("Cellphonedata.csv")
+View(Cellphn.d)
+summary(Cellphn.d)
+
+```
+
+```{r}
+
+boxplot(Cellphn.d$AccountWeeks)
+
+
+```
+
+
+```{r}
+
+boxplot(Cellphn.d$DataUsage)
+
+
+```
+
