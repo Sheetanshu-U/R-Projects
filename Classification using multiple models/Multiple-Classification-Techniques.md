@@ -168,20 +168,6 @@ logit
 ##checking overall validity of the model
 
 library(lmtest)
-```
-
-    ## Warning: package 'lmtest' was built under R version 3.6.2
-
-    ## Loading required package: zoo
-
-    ## 
-    ## Attaching package: 'zoo'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     as.Date, as.Date.numeric
-
-``` r
 lrtest(logit)
 ```
 
