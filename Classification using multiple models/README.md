@@ -1,6 +1,6 @@
 ## Data description
 
-•	The data set contains 8 predictor variables and a target variable
+_ The data set contains 8 predictor variables and a target variable
 •	The target variable has three categories of employees (who use cars to commute to workplace, who use public transport, who use two wheelers)
 •	Altogether, there are 444 observations (rows)
 •	Predictor variables include attributes - salary, work experience, distance of workplace from home, age, whether the employee has a driving license, gender and qualification
