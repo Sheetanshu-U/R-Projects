@@ -7,15 +7,13 @@ Sheetanshu
 getwd()
 ```
 
-    ## [1] "C:/Users/Admin/Desktop/Stats/Markdown 2/Projects/Classification using multiple models"
-
 ``` r
 data.cars = read.csv("Cars.csv", header = TRUE)
 
 View(data.cars)
 ```
 
-\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#Exploratory data analysis
+## Exploratory data analysis
 and data preparation
 
 ``` r
