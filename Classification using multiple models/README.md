@@ -13,3 +13,4 @@ Models to be compared are - Logistic regression, Naive Bayes, KNN, Bagging and B
 Exploratory analysis of the dataset - missing value treatment, correlation check and heatmap generation, bivariate analysis through charts and plots
 Data preparation - balancing the target variable in-case required, splitting the data into train and test
 Model building and result comparison through confusion matrix
+nn
