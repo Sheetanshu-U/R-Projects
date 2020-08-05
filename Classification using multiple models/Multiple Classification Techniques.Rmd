@@ -1,0 +1,514 @@
+
+---
+title: "Multiple Classification Techniques"
+author: "Sheetanshu"
+date: "8/3/2020"
+output: github_document
+  
+---
+
+
+```{r}
+
+getwd()
+
+data.cars = read.csv("Cars.csv", header = TRUE)
+
+View(data.cars)
+
+```
+
+######################Exploratory data analysis and data preparation
+
+
+```{r}
+############checking complete cases
+
+sum(complete.cases(data.cars))
+
+colSums(is.na(data.cars))
+
+```
+
+#########The data set has one incomplete case
+
+
+```{r}
+############taking complete cases for analysis
+
+data.cars2 = data.cars[complete.cases(data.cars), ]
+
+```
+
+
+```{r}
+#########converting categorical variables into factors
+
+data.cars2$Engineer = as.factor(data.cars2$Engineer)
+data.cars2$MBA = as.factor(data.cars2$MBA)
+data.cars2$license = as.factor(data.cars2$license)
+
+```
+
+
+
+```{r}
+
+########checking whether the target variable(Transport) is balanced or not 
+
+prop.table(table(data.cars2$Transport))
+
+```
+
+#############The category cars make up 13.7% of the data while other transport make up the remaining. Since we are interested in only two categories - "Car" and "Non-Car" Balancing the target variable is not required as both of these categories are over 10%
+
+
+```{r}
+
+data.cars2$Transport = as.character(data.cars2$Transport)
+
+data.cars2$Transport[data.cars2$Transport=="Public Transport"] = "0"
+data.cars2$Transport[data.cars2$Transport=="2Wheeler"] = "0"
+data.cars2$Transport[data.cars2$Transport=="Car"] = "1"
+
+
+data.cars2$Transport = as.factor(data.cars2$Transport)
+
+
+```
+
+
+```{r}
+
+cor(data.cars2[, c(1, 5, 6, 7)])
+
+
+```
+
+
+```{r}
+
+library(reshape2)
+library(ggplot2)
+qplot(x = Var1, y = Var2,
+      data = melt(cor(data.cars2[, c(1, 5, 6, 7)])),
+      fill = value,
+      geom = "tile")
+
+
+
+```
+
+
+```{r}
+
+View(data.cars2)
+
+ggplot(data.cars2, aes(x = Transport, y = Salary)) +geom_boxplot()
+
+
+```
+
+
+
+```{r}
+
+ggplot(data.cars2, aes(x = Transport, y = Age)) +geom_boxplot()
+
+
+```
+
+
+
+```{r}
+
+library(caret)
+
+?createDataPartition
+
+part = createDataPartition(data.cars2$Transport, p = 0.7, list = FALSE)
+
+train.cars3 = data.cars2[part, ]
+test.cars3 = data.cars2[-part, ]
+
+```
+
+
+```{r}
+
+##############Creating duplicate train and test sets - one for each model
+
+train.cars4 = train.cars3
+train.cars5 = train.cars3
+train.cars6 = train.cars3
+train.cars7 = train.cars3
+
+test.cars4 = test.cars3
+test.cars5 = test.cars3
+test.cars6 = test.cars3
+test.cars7 = test.cars3
+
+```
+
+
+
+```{r}
+
+##############fitting logistic regression model
+
+logit = glm(Transport~., data = train.cars3, family=binomial)
+
+logit
+
+```
+
+
+```{r}
+
+##checking overall validity of the model
+
+library(lmtest)
+
+lrtest(logit)
+
+```
+
+
+
+```{r}
+
+summary(logit)
+
+```
+
+
+```{r}
+
+library(car)
+
+vif(logit)
+
+```
+
+
+```{r}
+
+##########removing variables with p value > o.05
+
+train.cars31 = train.cars3[, -c(3, 4)]
+
+View(train.cars31)
+
+```
+
+
+
+```{r}
+
+##########fitting the model
+
+logit = glm(Transport~., data = train.cars31, family=binomial)
+
+summary(logit)
+
+```
+
+
+
+```{r}
+
+##########checking vif of remaining variables
+
+vif(logit)
+
+```
+
+
+```{r}
+
+##########removing multi collinear variables
+
+View(train.cars31)
+
+train.cars32 = train.cars31[, -c(1, 2, 3)]
+
+View(train.cars32)
+
+```
+
+
+```{r}
+
+##########fitting the model again
+
+logit = glm(Transport~., data = train.cars32, family=binomial)
+
+summary(logit)
+
+```
+
+
+
+```{r}
+
+##########finally checking vif
+
+vif(logit)
+
+```
+
+
+```{r}
+
+##checking pseudo R square
+
+library(pscl)
+
+pR2(logit)
+
+```
+
+
+```{r}
+
+###########preparing the test dataset
+
+View(test.cars3)
+
+test.cars32 = test.cars3[, -c(1, 2, 3, 4, 5)]
+
+View(test.cars32)
+
+```
+
+
+```{r}
+
+##predicting the train and test data set
+
+predicted.logit = predict(logit, train.cars32, type = "response")
+
+predicted.logit = floor(predicted.logit+0.5)
+
+predicted.logitest = predict(logit, test.cars32, type = "response")
+
+predicted.logitest = floor(predicted.logitest+0.5)
+
+
+```
+
+
+```{r}
+
+##############preparing confusion matrix
+
+predicted.logit = as.factor(predicted.logit)
+
+predicted.logitest = as.factor(predicted.logitest)
+
+
+confusionMatrix(predicted.logit, train.cars32$Transport, positive = "1")
+
+
+
+```
+
+
+```{r}
+
+
+confusionMatrix(predicted.logitest, test.cars32$Transport, positive = "1")
+
+```
+
+
+#########################Model 2 - Naive Bayes
+
+```{r}
+
+library(e1071)
+
+nb=naiveBayes(Transport~., data=train.cars4)
+
+nb
+
+```
+
+```{r}
+
+## Predicting the training and test data
+
+nb_train_pred = predict(nb,train.cars4)
+
+nb_test_pred = predict(nb,test.cars4)
+
+```
+
+
+
+```{r}
+
+### Confusion matrix on the train data
+
+confusionMatrix(nb_train_pred,train.cars4$Transport, positive = "1")
+
+```
+
+```{r}
+
+### Confusion matrix on the test data
+
+confusionMatrix(nb_test_pred,test.cars4$Transport, positive = "1")
+
+```
+
+#########################Model 3 - KNN
+
+
+```{r}
+
+train.cars4[, c(1, 5, 6, 7)] = scale(train.cars4[, c(1, 5, 6, 7)])
+
+test.cars4[, c(1, 5, 6, 7)] = scale(test.cars4[, c(1, 5, 6, 7)])
+
+
+```
+
+```{r}
+
+train.cars4$Gender = as.character(train.cars4$Gender)
+
+train.cars4$Gender[train.cars4$Gender=="Male"]  = 1
+
+train.cars4$Gender[train.cars4$Gender=="Female"]  = 0
+
+test.cars4$Gender = as.character(test.cars4$Gender)
+
+test.cars4$Gender[test.cars4$Gender=="Male"]  = 1
+
+test.cars4$Gender[test.cars4$Gender=="Female"]  = 0
+
+
+```
+
+
+```{r}
+
+?knn
+
+library(DMwR)
+
+KNN = kNN(Transport~., train.cars4, test.cars4[, -9], norm = FALSE, k = 4)
+
+KNN2 = kNN(Transport~., train.cars4, train.cars4[, -9], norm = FALSE, k = 4)
+
+
+```
+
+
+```{r}
+
+##############confusion matrix 
+
+confusionMatrix(KNN, test.cars4$Transport, positive = "1")
+
+
+```
+
+
+```{r}
+
+##############confusion matrix train
+
+confusionMatrix(KNN2, train.cars4$Transport, positive = "1")
+
+
+```
+
+
+#########################Model 3 - Baggging
+
+
+```{r}
+
+library(caret) 
+
+?trainControl
+
+train.c = trainControl(method = "repeatedcv", number = 3)
+               
+modelrf = train(Transport ~., data = train.cars5, method = "rf", 
+              trControl = train.c, tuneLength = 5)
+
+```
+
+
+```{r}
+
+predrf1 = predict(modelrf, train.cars5)
+predrf2 = predict(modelrf, test.cars5)
+
+```
+
+
+```{r}
+
+##############confusion matrix train
+
+confusionMatrix(predrf1, train.cars5$Transport, positive = "1")
+
+
+```
+
+```{r}
+
+##############confusion matrix test
+
+confusionMatrix(predrf2, test.cars5$Transport, positive = "1")
+
+
+```
+
+
+#########################Model 4 - Boosting
+
+
+```{r}
+
+train.x = trainControl(method = "repeatedcv", number = 3)
+
+
+model.x = train(Transport ~., data = train.cars6, method = "xgbTree", 
+              trControl = train.x, tuneLength = 5)
+
+```
+
+
+
+
+```{r}
+
+predrx1 = predict(model.x, train.cars6)
+predrx2 = predict(model.x, test.cars6)
+
+```
+
+
+
+```{r}
+
+##################confusion matrix
+
+confusionMatrix(predrx1, train.cars6$Transport, positive = "1")
+
+```
+
+
+```{r}
+
+##################confusion matrix
+
+confusionMatrix(predrx2, test.cars6$Transport, positive = "1")
+
+```
+
