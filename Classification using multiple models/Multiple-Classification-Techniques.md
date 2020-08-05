@@ -13,8 +13,7 @@ data.cars = read.csv("Cars.csv", header = TRUE)
 View(data.cars)
 ```
 
-## Exploratory data analysis
-and data preparation
+### Exploratory data analysis and data preparation
 
 ``` r
 ############checking complete cases
@@ -114,15 +113,9 @@ ggplot(data.cars2, aes(x = Transport, y = Age)) +geom_boxplot()
 library(caret)
 ```
 
-    ## Loading required package: lattice
-
 ``` r
 ?createDataPartition
 ```
-
-    ## starting httpd help server ...
-
-    ##  done
 
 ``` r
 part = createDataPartition(data.cars2$Transport, p = 0.7, list = FALSE)
@@ -145,8 +138,9 @@ test.cars6 = test.cars3
 test.cars7 = test.cars3
 ```
 
+#### Fitting logistic regression model
+
 ``` r
-##############fitting logistic regression model
 
 logit = glm(Transport~., data = train.cars3, family=binomial)
 ```
@@ -469,7 +463,7 @@ confusionMatrix(predicted.logitest, test.cars32$Transport, positive = "1")
     ##        'Positive' Class : 1               
     ## 
 
-\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#Model 2 - Naive Bayes
+#### Model 2 - Naive Bayes
 
 ``` r
 library(e1071)
@@ -611,7 +605,7 @@ confusionMatrix(nb_test_pred,test.cars4$Transport, positive = "1")
     ##        'Positive' Class : 1               
     ## 
 
-\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#Model 3 - KNN
+### Model 3 - KNN
 
 ``` r
 train.cars4[, c(1, 5, 6, 7)] = scale(train.cars4[, c(1, 5, 6, 7)])
@@ -725,7 +719,7 @@ confusionMatrix(KNN2, train.cars4$Transport, positive = "1")
     ##        'Positive' Class : 1               
     ## 
 
-\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#Model 3 - Baggging
+#### Model 4 - Baggging
 
 ``` r
 library(caret) 
@@ -811,7 +805,7 @@ confusionMatrix(predrf2, test.cars5$Transport, positive = "1")
     ##        'Positive' Class : 1               
     ## 
 
-\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#Model 4 - Boosting
+#### Model 5 - Boosting
 
 ``` r
 train.x = trainControl(method = "repeatedcv", number = 3)
